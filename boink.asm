@@ -30,7 +30,7 @@
 .ContinueGame                       ; Called between rounds to reset only some variables
     ; Check scores to see if we have a winner
     LD AB, (.ScoreA)
-    CP A, 49                        ; Reached 10 points
+    CP A, 58                        ; Reached 10 points
     JP EQ, .PaddleAWins
     LD AB, (.ScoreB)
     CP A, 58                        ; Reached 10 points
