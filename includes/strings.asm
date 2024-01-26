@@ -10,16 +10,46 @@
     ; Draw all the static strings
     LD EFG, .StringControls
     LD HI, 190
-    LD JK, 262
+    LD JK, 261
     LD L, 15
-    CALLR .DrawString
+    CALL .DrawString
     
     LD EFG, .StringTitle            ; The address of the null terminated string
     LD HI, 1                        ; X coordinate
     LD JK, 1                        ; Y coordinate
-    LD L, 200                       ; Color
-    CALLR .DrawString
+    LD L, 240                       ; Color
+    CALL .DrawString
+    RET
 
+.DrawScores
+    LD EFG, .ScoreA
+    LD HI, 10
+    LD JK, 50
+    LD L, 210
+    CALL .DrawString
+
+    LD EFG, .ScoreB
+    LD HI, 455
+    LD JK, 255
+    LD L, 210
+    CALL .DrawString
+    RET
+
+.DrawGameOverString
+    LD EFG, (.StringWinPointer)     ; Loads the 3 byte address stored in memory
+    LD HI, 200
+    LD JK, 50
+    LD L, 150
+    CALL .DrawString
+    CALL .DrawPlayAgainString
+    RET
+
+.DrawPlayAgainString
+    LD EFG, .StringPlayAgain
+    LD HI, 130
+    LD JK, 80
+    LD L, 150
+    CALL .DrawString
     RET
 
 ; Routine to draw text
@@ -41,6 +71,14 @@
     #DB [952] 0                     ; Reserve 952 bytes for the font data
 
 .StringTitle
-    #DB "BOINK v1", 0
+    #DB "BOINK v0.1", 0
 .StringControls
-    #DB ", = left   . = right", 0
+    #DB "Z = left   X = right", 0
+.StringWinPointer
+    #DB 0x000000
+.StringAWin
+    #DB "Computer wins!", 0
+.StringBWin
+    #DB "Player wins!", 0
+.StringPlayAgain
+    #DB "Press Y to play again, ESC to exit!", 0
