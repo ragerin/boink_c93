@@ -133,6 +133,8 @@
     ; Render UI
     CALL .DrawUI
 
+    VDL 0b00000111  ; Manually draw the video frames to the render buffer
+
     RET
 
 

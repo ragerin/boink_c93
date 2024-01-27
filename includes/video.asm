@@ -1,14 +1,22 @@
 .InitializeVideo
-    LD A, 0x02                          ; SetVideoPagesCount
-    LD B, 0x03                          ; Pages count
-                                        ; 0 = bg, 1 = objects, 2 = ui
-    INT 0x01, A                         ; Video interrupt
-
+    CALL .InitRenderer
     CALL .ClearBG
     CALL .ClearObjects
     CALL .ClearUI
     RET
 
+.InitRenderer
+    LD A, 0x02                          ; SetVideoPagesCount
+    LD B, 0x03                          ; Pages count (0 = background, 1 = objects, 2 = UI)
+    INT 0x01, A                         ; Video interrupt
+
+    ; Sets the video buffer control mode to manual so we can update the video buffers 
+    ; only when the scene is complete (with a VDL - video draw layers instruction)
+    LD A, 0x33
+    LD B, 0b00000000                    ; All layers to manual (0)
+    INT 0x01, A                         ; Video interrupt
+
+    RET
 
 .ClearBG
     LD A, 0x05                          ; ClearVideoPage
