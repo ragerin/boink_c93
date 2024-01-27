@@ -39,16 +39,20 @@
     LD EFG, (.StringWinPointer)     ; Loads the 3 byte address stored in memory
     LD HI, 200
     LD JK, 50
-    LD L, 150
+    LD L, (.StringColor)
     CALL .DrawString
     CALL .DrawPlayAgainString
+
+    ; Manually draw the video frames to the render buffer
+    VDL 0b00000111
+    
     RET
 
 .DrawPlayAgainString
     LD EFG, .StringPlayAgain
     LD HI, 130
     LD JK, 80
-    LD L, 150
+    LD L, (.StringColor)
     CALL .DrawString
     RET
 
