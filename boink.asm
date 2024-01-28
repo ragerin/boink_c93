@@ -1,4 +1,4 @@
-#include ..\..\lib\c93-keyboard.asm
+#include includes\keyboard.asm
 #include includes\video.asm
 #include includes\clock.asm
 #include includes\strings.asm
