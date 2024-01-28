@@ -36,51 +36,19 @@
 
 ; Primary Game loop screen
 .MainGameScreen 
-    CALL .IsUserExiting
-    JR Z, .ExitProgram
-
     ; Update clock routine for frame delta time
     CALL .HasUpdateTimePassed       ; Updates the clock and also returns whether it passed the target frame time
-    CALL Z, .FixedUpdate            ; We call the FixedUpdate routine
+    JR NZ, .MainGameScreen        ; We loop back until the allowed timeframe is reached
     
-    JP .MainGameScreen
-
-; Game over screen
-.PaddleAWins
-    LD PQR, .StringAWin             ; Load the string address
-    LD (.StringWinPointer), PQR     ; Store the value in the pointer value
-    JP .PaddleWinScreen
-.PaddleBWins
-    LD PQR, .StringBWin             ; Load the string address
-    LD (.StringWinPointer), PQR     ; Store the value in the pointer value
-    JP .PaddleWinScreen
-.PaddleWinScreen
-
-    ; Keyboard input
-    CALL .InputUpdate
-    CALL .UpdateUserExitFlag        ; Esc to escape
-
-    LD A, 27                        ; Escape key
-    CALL .InputKeyPressed
-    JP Z, .ResetGame
+    ; This is the fixed cycle update routine, which is called as uniformly as possible
+    ; to maintain a near-fixed update rate
     
-    LD A, 89                        ; Y for restarting the game
-    CALL .InputKeyPressed
-    JP Z, .ResetGame
-
-    CALL .DrawGameOverString        ; Draw the game over strings
-    
-    VDL 0b00000111                  ; Manually draw the video frames to the render buffer
-
-    JP .PaddleWinScreen
-
-
-; This is the fixed cycle update routine, which is called as uniformly as possible
-; to maintain a near-fixed update rate
-.FixedUpdate
     ; Update keyboard input
     CALL .InputUpdate
     CALL .UpdateUserExitFlag
+
+    CALL .IsUserExiting
+    JR Z, .ExitProgram
 
     ; Paddle A movement (computer)
     CALL .UpdateCompPaddle
@@ -105,7 +73,42 @@
 
     VDL 0b00000111                  ; Manually draw the video frames to the render buffer
 
-    RET
+    JP .MainGameScreen
+
+
+
+
+; Game over screen
+.PaddleAWins
+    LD PQR, .StringAWin             ; Load the string address
+    LD (.StringWinPointer), PQR     ; Store the value in the pointer value
+    JP .PaddleWinScreen
+.PaddleBWins
+    LD PQR, .StringBWin             ; Load the string address
+    LD (.StringWinPointer), PQR     ; Store the value in the pointer value
+    JP .PaddleWinScreen
+.PaddleWinScreen
+
+    ; Keyboard input
+    CALL .InputUpdate
+    CALL .UpdateUserExitFlag        ; Esc to escape
+
+    LD A, 27                        ; Escape key
+    CALL .InputKeyPressed
+    JP Z, .ResetGame
+
+    LD A, 89                        ; Y for restarting the game
+    CALL .InputKeyPressed
+    JP Z, .ResetGame
+
+    CALL .DrawGameOverString        ; Draw the game over strings
+    
+    VDL 0b00000111                  ; Manually draw the video frames to the render buffer
+
+    JP .PaddleWinScreen
+
+
+
 
 
 .ExitProgram
