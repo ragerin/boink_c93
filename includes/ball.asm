@@ -42,12 +42,12 @@
     LD AB, (.ScoreB)
     INC A
     LD (.ScoreB), AB
-    JP .ContinueGame
+    JP .StartNewGame
 .UpdateBallY_oob_bottom
     LD AB, (.ScoreA)
     INC A
     LD (.ScoreA), AB
-    JP .ContinueGame
+    JP .StartNewGame
 
 .UpdateBallY_paddleAhit
     PUSH BC                         ; Store the Y value

@@ -21,40 +21,25 @@
     ; Setup game variables
     JP .ResetGame
 
-
 .ResetGame                          ; Called when we want to fully reset
-    ; Reset the scores
-    LD A, 48
-    LD B, 0
-    LD (.ScoreA), AB
-    LD (.ScoreB), AB
+    CALL .ResetScore
+    
     ; Reset the serve
     LD A, 0x00
     LD (.BallDYS), A
-.ContinueGame                       ; Called between rounds to reset only some variables
+.StartNewGame                       ; Called between rounds to reset only some variables
     ; Check scores to see if we have a winner
-    LD AB, (.ScoreA)
-    CP A, 58                        ; Reached 10 points
-    JP EQ, .PaddleAWins
-    LD AB, (.ScoreB)
-    CP A, 58                        ; Reached 10 points
-    JP EQ, .PaddleBWins
-
-    ; Reset positions
-    LD AB, 00216
-    LD (.PaddleAX), AB
-    LD (.PaddleBX), AB
-    LD AB, 00237
-    LD (.BallX), AB
+    CALL .CheckForWinners
+    CALL .SetDefaultPositions
 
     ; Check who has the serve by looking at the Y sign
     LD A, (.BallDYS)
     CP A, 0
     JP EQ, .ResetGame_a_serve       ; 0 is moving down, so A serves
-    LD AB, 00240                    ; Or we set the ball up for B
+    LD AB, 240                      ; Or we set the ball up for B
     JP .ResetGame_end
 .ResetGame_a_serve
-    LD AB, 0025                     ; Set the ball up for A
+    LD AB, 25                       ; Set the ball up for A
 .ResetGame_end
     LD (.BallY), AB
     

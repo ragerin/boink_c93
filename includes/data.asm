@@ -1,3 +1,34 @@
+.ResetScore
+    LD A, 48
+    LD B, 0
+    LD (.ScoreA), AB
+    LD (.ScoreB), AB
+
+    RET
+
+.SetDefaultPositions
+    LD AB, 00216
+    LD (.PaddleAX), AB
+    LD (.PaddleBX), AB
+    LD AB, 00237
+    LD (.BallX), AB
+
+    RET
+
+.CheckForWinners
+    LD AB, (.ScoreA)
+    CP A, 50                        ; Reached 2 points
+    JP EQ, .PaddleAWins
+    LD AB, (.ScoreB)
+    CP A, 50                        ; Reached 2 points
+    JP EQ, .PaddleBWins
+
+    RET
+
+
+
+
+
 ; Game memory
 .PaddleAX
     #DB 0x0000
