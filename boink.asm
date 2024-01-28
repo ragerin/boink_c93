@@ -23,35 +23,20 @@
 
 .ResetGame                          ; Called when we want to fully reset
     CALL .ResetScore
+    CALL .ResetBallServe
     
-    ; Reset the serve
-    LD A, 0x00
-    LD (.BallDYS), A
 .StartNewGame                       ; Called between rounds to reset only some variables
     ; Check scores to see if we have a winner
     CALL .CheckForWinners
-    CALL .SetDefaultPositions
-
-    ; Check who has the serve by looking at the Y sign
-    LD A, (.BallDYS)
-    CP A, 0
-    JP EQ, .ResetGame_a_serve       ; 0 is moving down, so A serves
-    LD AB, 240                      ; Or we set the ball up for B
-    JP .ResetGame_end
-.ResetGame_a_serve
-    LD AB, 25                       ; Set the ball up for A
-.ResetGame_end
-    LD (.BallY), AB
-    
-    RAND A, 2                       ; Randomize X direction
-    LD (.BallDXS), A
+    CALL .SetDefaultPaddlePositions
+    CALL .InitializeBall
 
     JP .MainGameScreen
 
 
 ; Primary Game loop screen
 .MainGameScreen
-    ; Keyboard input
+    ; Update keyboard input
     CALL .InputUpdate 
 
     ; Exit with escape

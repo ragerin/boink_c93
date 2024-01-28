@@ -6,12 +6,36 @@
 
     RET
 
-.SetDefaultPositions
+.ResetBallServe
+    ; Reset the serve
+    LD A, 0x00
+    LD (.BallDYS), A
+
+    RET
+
+.SetDefaultPaddlePositions
     LD AB, 00216
     LD (.PaddleAX), AB
     LD (.PaddleBX), AB
+    
+    RET
+
+.InitializeBall
     LD AB, 00237
     LD (.BallX), AB
+    ; Check who has the serve by looking at the Y sign
+    LD A, (.BallDYS)
+    CP A, 0
+    JP EQ, .ResetGame_a_serve       ; 0 is moving down, so A serves
+    LD AB, 240                      ; Or we set the ball up for B
+    JP .ResetGame_end
+.ResetGame_a_serve
+    LD AB, 25                       ; Set the ball up for A
+.ResetGame_end
+    LD (.BallY), AB
+    
+    RAND A, 2                       ; Randomize X direction
+    LD (.BallDXS), A
 
     RET
 
@@ -24,6 +48,8 @@
     JP EQ, .PaddleBWins
 
     RET
+
+
 
 
 
