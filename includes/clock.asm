@@ -7,7 +7,7 @@
 
 ; This routine calculates the delta time between cycles
 ; Sets the A register to 1 if the desired frame rate has been reached
-.UpdateClock
+.HasUpdateTimePassed
     LD N, 0x03                          ; ReadClock
     LD O, 0x00                          ; Milliseconds
     LD PQR, .ClockTimeMs                ; Set the destination address to .ClockTimeMs
@@ -18,15 +18,15 @@
     SUB JKLM, FGHI                      ; Calculate the delta between the current and previous clock ms
     LD OPQR, (.TargetFrameTime)         ; Get the value of the target frame rate
     CP JKLM, OPQR                       ; Compare the delta with the target frame time
-    JR GT, .UpdateClockTick             ; If the  delta is GTE than the target, we jump
-
-    LD A, 0                             ; The frame rate has not been reached, so return with 0
+    JR GT, .updateClockTick             ; If the  delta is GTE than the target, we jump
+    RESF Z                              ; The frame rate has not been reached, so reset flag Z
     RET
-.UpdateClockTick
+
+.updateClockTick
     ; The frame rate has been reached
     LD JKLM, (.ClockTimeMs)             ; Load the new clock time again
     LD (.ClockTimeMsPrevious), JKLM     ; Store the new time as the previous for next iteration
-    LD A, 1                             ; We return with 1 in A
+    SETF Z                              ; Sets flag zero
     RET
 
 

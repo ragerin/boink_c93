@@ -35,22 +35,15 @@
 
 
 ; Primary Game loop screen
-.MainGameScreen
-    ; Update keyboard input
-    CALL .InputUpdate 
-
-    ; Exit with escape
-    LD A, 27                        ; Escape key
-    CALL .InputKeyPressed
+.MainGameScreen 
+    CALL .IsUserExiting
     JR Z, .ExitProgram
-    
+
     ; Update clock routine for frame delta time
-    CALL .UpdateClock
-    CP A, 1                         ; Check if we are ready to do fixed frame work
-    CALL EQ, .FixedUpdate           ; We call the FixedUpdate routine
+    CALL .HasUpdateTimePassed       ; Updates the clock and also returns whether it passed the target frame time
+    CALL Z, .FixedUpdate            ; We call the FixedUpdate routine
     
     JP .MainGameScreen
-
 
 ; Game over screen
 .PaddleAWins
@@ -62,14 +55,15 @@
     LD (.StringWinPointer), PQR     ; Store the value in the pointer value
     JP .PaddleWinScreen
 .PaddleWinScreen
-    ; Keyboard input
-    CALL .InputUpdate 
 
-    ; Exit with escape
+    ; Keyboard input
+    CALL .InputUpdate
+    CALL .UpdateUserExitFlag        ; Esc to escape
+
     LD A, 27                        ; Escape key
     CALL .InputKeyPressed
-    JR Z, .ExitProgram
-
+    JP Z, .ResetGame
+    
     LD A, 89                        ; Y for restarting the game
     CALL .InputKeyPressed
     JP Z, .ResetGame
@@ -84,6 +78,10 @@
 ; This is the fixed cycle update routine, which is called as uniformly as possible
 ; to maintain a near-fixed update rate
 .FixedUpdate
+    ; Update keyboard input
+    CALL .InputUpdate
+    CALL .UpdateUserExitFlag
+
     ; Paddle A movement (computer)
     CALL .UpdateCompPaddle
 

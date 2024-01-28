@@ -50,9 +50,23 @@
     RET
 
 
+.UpdateUserExitFlag
+    PUSH A
+    LD A, 27                        ; Escape key
+    CALL .InputKeyPressed
+    JR NZ, .updateUserExitFlagExit
+    LD A, 1
+    LD (.UserRequestsExit), A
+    POP A
+.updateUserExitFlagExit
+    RET
 
-
-
+.IsUserExiting
+    PUSH A
+    LD A, (.UserRequestsExit)
+    CP A, 1
+    POP A
+    RET
 
 
 ; Game memory
@@ -131,3 +145,6 @@
 
 .StringColor
     #DB 19
+
+.UserRequestsExit
+    #DB 0
