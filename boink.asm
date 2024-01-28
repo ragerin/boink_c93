@@ -4,6 +4,7 @@
 #include includes\strings.asm
 #include includes\ball.asm
 #include includes\paddles.asm
+#include includes\state-handler.asm
 #include includes\data.asm
 
 
