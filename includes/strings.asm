@@ -66,26 +66,3 @@
     LD M, 2                         ; Video page
     INT 0x01, A                     ; Video interrupt
     RET
-
-
-; Fonts and strings
-.FontFile
-    #DB "fonts\DoctorJack.font", 0
-.FontData
-    #DB [1142] 0                     ; Reserve 952 bytes for the font data
-
-.StringTitle
-    #DB "BOINK v0.1", 0
-.StringControls
-    #DB "Z = left   X = right", 0
-.StringWinPointer
-    #DB 0x000000
-.StringAWin
-    #DB "Computer wins!", 0
-.StringBWin
-    #DB "Player wins!", 0
-.StringPlayAgain
-    #DB "Press Y to play again, ESC to exit!", 0
-
-.StringColor
-    #DB 19
