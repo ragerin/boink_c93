@@ -86,33 +86,3 @@
 
 .movePaddle_exit
     RET
-
-
-; Moves the paddles
-; BC is the current X
-; DE is the movement speed
-; FG is the paddle size
-; HIJ is the memory address for the paddle X position
-.MovePaddleRight
-    ADD BC, DE
-
-    ; Check right wall collision
-    LD DE, (.WallRight)
-    SUB DE, FG
-    CP BC, DE
-    JR GT, .MovePaddle_ret
-
-    LD (HIJ), BC                    ; Store the new X
-    RET
-.MovePaddleLeft
-    SUB BC, DE
-    
-    ; Check left wall collision
-    LD DE, (.WallLeft)
-    CP BC, DE
-    JR LT, .MovePaddle_ret
-
-    LD (HIJ), BC                    ; Store the new X
-    RET
-.MovePaddle_ret
-    RET
