@@ -11,13 +11,13 @@
     LD EFG, .StringControls
     LD HI, 190
     LD JK, 261
-    LD L, 15
+    LD L, (.StringColor)
     CALL .DrawString
     
     LD EFG, .StringTitle            ; The address of the null terminated string
     LD HI, 1                        ; X coordinate
     LD JK, 1                        ; Y coordinate
-    LD L, 240                       ; Color
+    LD L, (.StringColor)            ; Color
     CALL .DrawString
     RET
 
@@ -25,13 +25,13 @@
     LD EFG, .ScoreA
     LD HI, 10
     LD JK, 50
-    LD L, 210
+    LD L, (.StringColor)
     CALL .DrawString
 
     LD EFG, .ScoreB
     LD HI, 455
     LD JK, 255
-    LD L, 210
+    LD L, (.StringColor)
     CALL .DrawString
     RET
 
@@ -39,16 +39,20 @@
     LD EFG, (.StringWinPointer)     ; Loads the 3 byte address stored in memory
     LD HI, 200
     LD JK, 50
-    LD L, 150
+    LD L, (.StringColor)
     CALL .DrawString
     CALL .DrawPlayAgainString
+
+    ; Manually draw the video frames to the render buffer
+    VDL 0b00000111
+    
     RET
 
 .DrawPlayAgainString
     LD EFG, .StringPlayAgain
     LD HI, 130
     LD JK, 80
-    LD L, 150
+    LD L, (.StringColor)
     CALL .DrawString
     RET
 
@@ -66,9 +70,9 @@
 
 ; Fonts and strings
 .FontFile
-    #DB "fonts\CleanCut.font", 0
+    #DB "fonts\DoctorJack.font", 0
 .FontData
-    #DB [952] 0                     ; Reserve 952 bytes for the font data
+    #DB [1142] 0                     ; Reserve 952 bytes for the font data
 
 .StringTitle
     #DB "BOINK v0.1", 0
@@ -82,3 +86,6 @@
     #DB "Player wins!", 0
 .StringPlayAgain
     #DB "Press Y to play again, ESC to exit!", 0
+
+.StringColor
+    #DB 19

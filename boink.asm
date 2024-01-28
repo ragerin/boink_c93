@@ -133,12 +133,15 @@
     ; Render UI
     CALL .DrawUI
 
+    ; Manually draw the video frames to the render buffer
+    VDL 0b00000111
+
     RET
 
 
 .UpdateCompPaddle
     ; Make the computer sometimes wait a cycle
-    RAND A, 8                       
+    RAND A, 16                       
     CP A, 2
     JP LTE, .UpdateCompPaddle_ret
 
@@ -422,9 +425,9 @@
 .PaddleBY
     #DB 00250
 .PaddleASpeed
-    #DB 008
+    #DB 004
 .PaddleBSpeed
-    #DB 008
+    #DB 004
 .PaddleASize
     #DB 0048
 .PaddleBSize
@@ -437,13 +440,13 @@
 .BallX
     #DB 00237
 .BallDX
-    #DB 003
+    #DB 001
 .BallDXS
     #DB 0x00                        ; sign: 0x00 positive, 0x01 negative
 .BallY
     #DB 0030
 .BallDY
-    #DB 005
+    #DB 002
 .BallDYS
     #DB 0x00                        ; sign: 0x00 positive, 0x01 negative
 

@@ -33,7 +33,7 @@
 ; Frame rate related memory
 .TargetFrameTime
     ; We prepend 3 extra bytes of zeroes, since we need to compare to an 4 byte register
-    #DB 0, 0, 0, 33                     ; 33 ms between updates per frame should give approx. 30 FPS
+    #DB 0, 0, 0, 16                     ; 16 ms between updates per frame should give approx. 60 FPS
 .ClockTimeMs
     #DB 0x00000000                      ; 32 bits for clock ms
 .ClockTimeMsPrevious
