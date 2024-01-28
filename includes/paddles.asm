@@ -27,35 +27,65 @@
 .UpdateCompPaddle_ret
     RET
 
-
-; TODO: DRY these routines
-.MovePaddleARight
-    LD BC, (.PaddleAX)              ; Load the paddle X
-    LD DE, (.PaddleASpeed)          ; Load the speed
-    LD FG, (.PaddleASize)
-    LD HIJ, .PaddleAX
-    CALL .MovePaddleRight
-    RET
 .MovePaddleALeft
-    LD BC, (.PaddleAX)              ; Load the paddle X
+    LD A, -1
+    CALLR .MovePaddleA
+    RET
+
+.MovePaddleARight
+    LD A, 1
+    CALLR .MovePaddleA
+    RET
+
+
+.MovePaddleBLeft
+    LD A, -1
+    CALLR .MovePaddleB
+    RET
+
+.MovePaddleBRight
+    LD A, 1
+    CALLR .MovePaddleB
+    RET
+
+
+; A should contain -1 for left and 1 for right
+
+.MovePaddleA
+    LD HIJ, .PaddleAX
+    LD BC, (HIJ)              ; Load the paddle X
     LD DE, (.PaddleASpeed)          ; Load the speed
     LD FG, (.PaddleASize)
-    LD HIJ, .PaddleAX
-    CALL .MovePaddleLeft
+    CALL .MovePaddle
     RET
-.MovePaddleBRight
-    LD BC, (.PaddleBX)              ; Load the paddle X
+
+.MovePaddleB
+    LD HIJ, .PaddleBX
+    LD BC, (HIJ)              ; Load the paddle X
     LD DE, (.PaddleBSpeed)          ; Load the speed
     LD FG, (.PaddleBSize)
-    LD HIJ, .PaddleBX
-    CALL .MovePaddleRight
+    CALL .MovePaddle
     RET
-.MovePaddleBLeft
-    LD BC, (.PaddleBX)              ; Load the paddle X
-    LD DE, (.PaddleBSpeed)          ; Load the speed
-    LD FG, (.PaddleBSize)
-    LD HIJ, .PaddleBX
-    CALL .MovePaddleLeft
+
+.MovePaddle
+    SMUL DE, A              ; Multiply the speed with the direction (sign)
+    ADD BC, DE              
+
+    ; Check right wall collision
+    LD DE, (.WallRight)
+    SUB DE, FG
+    CP BC, DE
+    JR GT, .movePaddle_exit
+
+    ; Check left wall collision
+    LD DE, (.WallLeft)
+    CP BC, DE
+    JR LT, .movePaddle_exit
+
+    LD (HIJ), BC                    ; Store the new X
+    RET
+
+.movePaddle_exit
     RET
 
 
