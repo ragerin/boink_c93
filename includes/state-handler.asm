@@ -9,9 +9,6 @@
     CALL .InputUpdate
     CALL .UpdateUserExitFlag
 
-    CALL .IsUserExiting
-    JR Z, .ExitProgram
-
     ; Paddle B movement
     LD A, 90                        ; Z
     CALL .InputKeyPressed
@@ -55,10 +52,6 @@
     VDL 0b00000111                  ; Manually draw the video frames to the render buffer
 
     JP .PaddleWinScreen
-
-
-
-
 
 
 .ResetScore

@@ -1,5 +1,5 @@
 .UpdateCompPaddle
-    ; Make the computer sometimes wait a cycle
+    ; Make the computer sometimes wait a frame
     RAND A, 16                       
     CP A, 2
     JP LTE, .UpdateCompPaddle_ret
@@ -50,7 +50,6 @@
 
 
 ; A should contain -1 for left and 1 for right
-
 .MovePaddleA
     LD HIJ, .PaddleAX
     LD BC, (HIJ)              ; Load the paddle X
