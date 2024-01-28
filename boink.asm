@@ -42,8 +42,6 @@
     ; Exit with escape
     LD A, 27                        ; Escape key
     CALL .InputKeyPressed
-    
-    CP A, 1
     JR Z, .ExitProgram
     
     ; Update clock routine for frame delta time
@@ -70,13 +68,11 @@
     ; Exit with escape
     LD A, 27                        ; Escape key
     CALL .InputKeyPressed
-    CP A, 1
     JR Z, .ExitProgram
 
     LD A, 89                        ; Y for restarting the game
     CALL .InputKeyPressed
-    CP A, 1
-    JP EQ, .ResetGame
+    JP Z, .ResetGame
 
     CALL .DrawGameOverString        ; Draw the game over strings
     
@@ -94,11 +90,9 @@
     ; Paddle B movement
     LD A, 90                        ; Z
     CALL .InputKeyPressed
-    CP A, 1
     CALL Z, .MovePaddleBLeft
     LD A, 88                        ; X
     CALL .InputKeyPressed
-    CP A, 1
     CALL Z, .MovePaddleBRight
 
     ; Update the ball position

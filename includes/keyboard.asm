@@ -19,7 +19,7 @@
 
 ; checks whether a key state has changed from not pressed to pressed. Indicates a key has been pressed
 ; input: A - the keycode to look for
-; output:A is 1 if true, 0 if false
+; output:Sets Z flag to true or false depending on whether the key was pressed
 .InputKeyPressed
     ; expects key code in register A
     ; if current state is keyDown and previous state is keyUp
@@ -29,16 +29,8 @@
     LD X, A
     CALLR .input_keyUp_previous
     ADD A, X
-    
     POP B, Z
-    
     CP A, 2
-    JR Z, .input_keyPressed_true
-    LD A, 0
-    RET
-
-.input_keyPressed_true
-    LD A, 1                 ; can be replaced with DEC A, kept it like this for readibility
     RET
 
 .input_keyDown_current
@@ -54,7 +46,7 @@
 ; whether the state of key code received in A is keyDown (exists in the indicated buffer)
 ; input: A - the keycode to look for
 ; input: BCD - the address of the buffer to search
-; output:A is 1 if true, 0 if false
+; output:Sets Z flag to true or false depending on whether the key was pressed
 .input_keyDown              
     PUSH E, Z
     LD EF, 32
