@@ -109,6 +109,8 @@
     JP EQ, .ResetGame
 
     CALL .DrawGameOverString        ; Draw the game over strings
+    
+    VDL 0b00000111                  ; Manually draw the video frames to the render buffer
 
     JP .PaddleWinScreen
 
@@ -139,8 +141,7 @@
     ; Render UI
     CALL .DrawUI
 
-    ; Manually draw the video frames to the render buffer
-    VDL 0b00000111
+    VDL 0b00000111                  ; Manually draw the video frames to the render buffer
 
     RET
 

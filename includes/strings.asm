@@ -42,9 +42,6 @@
     LD L, (.StringColor)
     CALL .DrawString
     CALL .DrawPlayAgainString
-
-    ; Manually draw the video frames to the render buffer
-    VDL 0b00000111
     
     RET
 
