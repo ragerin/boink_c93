@@ -1,3 +1,66 @@
+.Update
+    ; This is the fixed cycle update routine, which is called as uniformly as possible
+    ; to maintain a near-fixed update rate
+    
+    ; Paddle A movement (computer)
+    CALL .UpdateCompPaddle
+
+    ; Update keyboard input
+    CALL .InputUpdate
+    CALL .UpdateUserExitFlag
+
+    CALL .IsUserExiting
+    JR Z, .ExitProgram
+
+    ; Paddle B movement
+    LD A, 90                        ; Z
+    CALL .InputKeyPressed
+    CALL Z, .MovePaddleBLeft
+    LD A, 88                        ; X
+    CALL .InputKeyPressed
+    CALL Z, .MovePaddleBRight
+
+    ; Update the ball position
+    CALL .UpdateBallX
+    CALL .UpdateBallY
+
+    RET
+
+; TODO unwind this
+; Game over screen
+.PaddleAWins
+    LD PQR, .StringAWin             ; Load the string address
+    LD (.StringWinPointer), PQR     ; Store the value in the pointer value
+    JP .PaddleWinScreen
+.PaddleBWins
+    LD PQR, .StringBWin             ; Load the string address
+    LD (.StringWinPointer), PQR     ; Store the value in the pointer value
+    JP .PaddleWinScreen
+.PaddleWinScreen
+
+    ; Keyboard input
+    CALL .InputUpdate
+    CALL .UpdateUserExitFlag        ; Esc to escape
+
+    LD A, 27                        ; Escape key
+    CALL .InputKeyPressed
+    JP Z, .ResetGame
+
+    LD A, 89                        ; Y for restarting the game
+    CALL .InputKeyPressed
+    JP Z, .ResetGame
+
+    CALL .DrawGameOverString        ; Draw the game over strings
+    
+    VDL 0b00000111                  ; Manually draw the video frames to the render buffer
+
+    JP .PaddleWinScreen
+
+
+
+
+
+
 .ResetScore
     LD A, 48
     LD B, 0

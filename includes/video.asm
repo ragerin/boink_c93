@@ -37,10 +37,17 @@
     RET
 
 
-.RenderGameObjects
+.Draw
     CALL .ClearObjects
+    CALL .ClearUI
+
     CALL .DrawPaddles
     CALL .DrawBall
+    ; Draw the UI
+    CALL .DrawStaticStrings
+    CALL .DrawScores
+
+    VDL 0b00000111                  ; Manually draw the video frames to the render buffer
     RET
 
 .DrawPaddles
@@ -71,11 +78,4 @@
     LD IJ, (.BallSize)              ; Height
     LD K, 100                       ; Color
     INT 0x01, A                     ; Video interrupt
-    RET
-
-.DrawUI
-    ; Clear the UI page
-    CALL .ClearUI
-    CALL .DrawStaticStrings
-    CALL .DrawScores
     RET
