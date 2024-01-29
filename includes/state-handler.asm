@@ -10,10 +10,10 @@
     CALL .UpdateUserExitFlag
 
     ; Paddle B movement
-    LD A, 90                        ; Z
+    LD A, 90                        ; Z key
     CALL .InputKeyPressed
     CALL Z, .MovePaddleBLeft
-    LD A, 88                        ; X
+    LD A, 88                        ; X key
     CALL .InputKeyPressed
     CALL Z, .MovePaddleBRight
 
@@ -70,14 +70,14 @@
     RET
 
 .SetDefaultPaddlePositions
-    LD AB, 00216
+    LD AB, 216
     LD (.PaddleAX), AB
     LD (.PaddleBX), AB
     
     RET
 
 .InitializeBall
-    LD AB, 00237
+    LD AB, 237
     LD (.BallX), AB
     ; Check who has the serve by looking at the Y sign
     LD A, (.BallDYS)
@@ -91,7 +91,9 @@
     LD (.BallY), AB
     
     RAND A, 2                       ; Randomize X direction
-    LD (.BallDXS), A
+    MUL A, 2
+    SUB A, 1
+    LD (.BallXDirection), A
 
     RET
 

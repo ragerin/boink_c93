@@ -15,9 +15,9 @@
 .PaddleBSpeed
     #DB 004
 .PaddleASize
-    #DB 0048
+    #DB 0068
 .PaddleBSize
-    #DB 0048
+    #DB 0068
 .PaddleHeight
     #DB 0010
 
@@ -27,8 +27,8 @@
     #DB 00237
 .BallDX
     #DB 001
-.BallDXS
-    #DB 0x00                        ; sign: 0x00 positive, 0x01 negative
+.BallXDirection
+    #DB 0xFF            ; 0xFF: -1, 0x01: 1
 .BallY
     #DB 0030
 .BallDY

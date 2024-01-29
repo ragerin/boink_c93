@@ -1,6 +1,6 @@
 .UpdateCompPaddle
     ; Make the computer sometimes wait a frame
-    RAND A, 16                       
+    RAND A, 6                       
     CP A, 2
     JP LTE, .UpdateCompPaddle_ret
 
