@@ -1,6 +1,6 @@
 .UpdateCompPaddle
-    ; Make the computer sometimes wait a cycle
-    RAND A, 16                       
+    ; Make the computer sometimes wait a frame
+    RAND A, 6                       
     CP A, 2
     JP LTE, .UpdateCompPaddle_ret
 
@@ -27,63 +27,62 @@
 .UpdateCompPaddle_ret
     RET
 
-
-; TODO: DRY these routines
-.MovePaddleARight
-    LD BC, (.PaddleAX)              ; Load the paddle X
-    LD DE, (.PaddleASpeed)          ; Load the speed
-    LD FG, (.PaddleASize)
-    LD HIJ, .PaddleAX
-    CALL .MovePaddleRight
-    RET
 .MovePaddleALeft
-    LD BC, (.PaddleAX)              ; Load the paddle X
+    LD A, -1
+    CALLR .MovePaddleA
+    RET
+
+.MovePaddleARight
+    LD A, 1
+    CALLR .MovePaddleA
+    RET
+
+
+.MovePaddleBLeft
+    LD A, -1
+    CALLR .MovePaddleB
+    RET
+
+.MovePaddleBRight
+    LD A, 1
+    CALLR .MovePaddleB
+    RET
+
+
+; A should contain -1 for left and 1 for right
+.MovePaddleA
+    LD HIJ, .PaddleAX
+    LD BC, (HIJ)              ; Load the paddle X
     LD DE, (.PaddleASpeed)          ; Load the speed
     LD FG, (.PaddleASize)
-    LD HIJ, .PaddleAX
-    CALL .MovePaddleLeft
-    RET
-.MovePaddleBRight
-    LD BC, (.PaddleBX)              ; Load the paddle X
-    LD DE, (.PaddleBSpeed)          ; Load the speed
-    LD FG, (.PaddleBSize)
-    LD HIJ, .PaddleBX
-    CALL .MovePaddleRight
-    RET
-.MovePaddleBLeft
-    LD BC, (.PaddleBX)              ; Load the paddle X
-    LD DE, (.PaddleBSpeed)          ; Load the speed
-    LD FG, (.PaddleBSize)
-    LD HIJ, .PaddleBX
-    CALL .MovePaddleLeft
+    CALL .MovePaddle
     RET
 
+.MovePaddleB
+    LD HIJ, .PaddleBX
+    LD BC, (HIJ)              ; Load the paddle X
+    LD DE, (.PaddleBSpeed)          ; Load the speed
+    LD FG, (.PaddleBSize)
+    CALL .MovePaddle
+    RET
 
-; Moves the paddles
-; BC is the current X
-; DE is the movement speed
-; FG is the paddle size
-; HIJ is the memory address for the paddle X position
-.MovePaddleRight
-    ADD BC, DE
+.MovePaddle
+    SMUL DE, A              ; Multiply the speed with the direction (sign)
+    ADD BC, DE              
 
     ; Check right wall collision
     LD DE, (.WallRight)
     SUB DE, FG
     CP BC, DE
-    JR GT, .MovePaddle_ret
+    JR GT, .movePaddle_exit
 
-    LD (HIJ), BC                    ; Store the new X
-    RET
-.MovePaddleLeft
-    SUB BC, DE
-    
     ; Check left wall collision
     LD DE, (.WallLeft)
     CP BC, DE
-    JR LT, .MovePaddle_ret
+    JR LT, .movePaddle_exit
 
     LD (HIJ), BC                    ; Store the new X
     RET
-.MovePaddle_ret
+
+.movePaddle_exit
     RET

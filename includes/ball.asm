@@ -42,12 +42,12 @@
     LD AB, (.ScoreB)
     INC A
     LD (.ScoreB), AB
-    JP .ContinueGame
+    JP .StartNewGame
 .UpdateBallY_oob_bottom
     LD AB, (.ScoreA)
     INC A
     LD (.ScoreA), AB
-    JP .ContinueGame
+    JP .StartNewGame
 
 .UpdateBallY_paddleAhit
     PUSH BC                         ; Store the Y value
@@ -90,7 +90,7 @@
     
     CP Z, 2                         ; Compare the flag counter
     JP GTE, .UpdateBallY_bounce
-    
+
     JP .UpdateBallY_ret
 .UpdateBallY_flag_inc
     INC Z
@@ -106,31 +106,32 @@
 .UpdateBallX
     LD BC, (.BallX)                 ; Load the ball X position
     LD DE, (.BallDX)                ; Load the ball X delta
-    LD F, (.BallDXS)                ; Load the ball X delta sign
-
-    CP F, 0x00                      ; Check if the sign is 0 positive, or 1 negative
-    CALL EQ, .UpdateBallX_right     ; Add or sub depending on the sign
-    CALL NE, .UpdateBallX_left
+    LD F, (.BallXDirection)         ; Load the ball X direction
+    
+    SMUL DE, F                      ; Multiply speed with direction
+    ADD BC, DE                      ; Add effective direction*speed to current X
 
     ; Handle wall collisions
     LD DE, (.WallLeft)              ; Load the left limit
     LD FG, (.WallRight)             ; Load the right limit
-    SUB16 FG, (.BallSize)           ; Sub the ball size
-    CP BC, DE                       ; Compare new X with left limit
-    JR LTE, .UpdateBallX_bounce     ; Bounce off the wall
-    CP BC, FG                       ; Compare new X with right limit
-    JR GTE, .UpdateBallX_bounce     ; Bounce off the wall
 
+    CP BC, DE
+    LDF D, 0b01000000               ; Get the GT flag
+    CP BC, FG
+    LDF E, 0b10000000               ; Get the LT flag
+    OR D, E                         ; Mix the flags
+    INV D                           ; Invert so we get the LTE and GTE flags instead of GT and LT
+    SR D, 6                         ; shift the flags so we can only get 10 or 01 (1 or 2)
+    CP D, 0
+    JR Z, .NoDirectionChange
+
+    INV D                           ; Invert bits, so 00000010 becomes 11111101 and 00000001 becomes 11111110
+    ADD D, 3                        ; Add 3 so 11111101 becomes 0 and 11111110 becomes 1
+    MUL D, 2                        ; transform that to 0 and 2
+    DEC D                           ; and again it can get to -1 and 1
+
+    LD (.BallXDirection), D
+
+.NoDirectionChange
     LD (.BallX), BC                 ; Store the new X position in memory
-    RET
-.UpdateBallX_right
-    ADD BC, DE
-    RET
-.UpdateBallX_left
-    SUB BC, DE
-    RET
-.UpdateBallX_bounce
-    LD A, (.BallDXS)                ; Loads the ball delta x sign
-    XOR A, 1                        ; Invert the bit
-    LD (.BallDXS), A                ; Store the inverted sign
     RET

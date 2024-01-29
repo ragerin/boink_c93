@@ -19,29 +19,35 @@
     RET
 
 .ClearBG
-    LD A, 0x05                      ; ClearVideoPage
     LD B, 0                         ; Page 0
     LD C, (.BGColor)                ; Color
-    INT 0x01, A                     ; Video interrupt
-    RET
+    JP .clearPage
 .ClearObjects
-    LD A, 0x05                      ; ClearVideoPage
     LD B, 1                         ; Page 1
     LD C, 0x00                      ; Color
-    INT 0x01, A                     ; Video interrupt
-    RET
+    JP .clearPage
 .ClearUI
-    LD A, 0x05                      ; ClearVideoPage
     LD B, 2                         ; Page 2
     LD C, 0x00                      ; Color
+    JP .clearPage
+
+.clearPage
+    LD A, 0x05                      ; ClearVideoPage
     INT 0x01, A                     ; Video interrupt
     RET
 
 
-.RenderGameObjects
+.Draw
     CALL .ClearObjects
+    CALL .ClearUI
+
     CALL .DrawPaddles
     CALL .DrawBall
+    ; Draw the UI
+    CALL .DrawStaticStrings
+    CALL .DrawScores
+
+    VDL 0b00000111                  ; Manually draw the video frames to the render buffer
     RET
 
 .DrawPaddles
@@ -72,11 +78,4 @@
     LD IJ, (.BallSize)              ; Height
     LD K, 100                       ; Color
     INT 0x01, A                     ; Video interrupt
-    RET
-
-.DrawUI
-    ; Clear the UI page
-    CALL .ClearUI
-    CALL .DrawStaticStrings
-    CALL .DrawScores
     RET
