@@ -8,7 +8,7 @@
     LD DE, (.PaddleAX)              ; Load the paddle left edge
     ADD DE, 5                       ; Shrink it a bit
     LD FG, (.PaddleAX)              ; Load the paddle right edge
-    ADD16 FG, (.PaddleASize)
+    ADD16 FG, (.PaddleAWidth)
     ADD FG, 5                       ; Shrink it a bit
 
     CP BC, DE
@@ -54,7 +54,7 @@
     LD HIJ, .PaddleAX
     LD BC, (HIJ)              ; Load the paddle X
     LD DE, (.PaddleASpeed)          ; Load the speed
-    LD FG, (.PaddleASize)
+    LD FG, (.PaddleAWidth)
     CALL .MovePaddle
     RET
 
@@ -62,7 +62,7 @@
     LD HIJ, .PaddleBX
     LD BC, (HIJ)              ; Load the paddle X
     LD DE, (.PaddleBSpeed)          ; Load the speed
-    LD FG, (.PaddleBSize)
+    LD FG, (.PaddleBWidth)
     CALL .MovePaddle
     RET
 

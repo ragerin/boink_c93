@@ -59,12 +59,12 @@
     ; A
     LD CD, (.PaddleAX)              ; X position top left
     LD EF, (.PaddleAY)              ; Y position top left
-    LD GH, (.PaddleASize)           ; Width
+    LD GH, (.PaddleAWidth)           ; Width
     INT 0x01, A                     ; Video interrupt
     ; B
     LD CD, (.PaddleBX)              ; X position top left
     LD EF, (.PaddleBY)              ; Y position top left
-    LD GH, (.PaddleBSize)           ; Width
+    LD GH, (.PaddleBWidth)           ; Width
     INT 0x01, A                     ; Video interrupt
 
     RET

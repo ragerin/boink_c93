@@ -17,10 +17,11 @@
     CALL .InputKeyPressed
     CALL Z, .MovePaddleBRight
 
+    CALL .CheckPaddleCollision
     ; Update the ball position
     CALL .UpdateBallX
     CALL .UpdateBallY
-
+    
     RET
 
 ; TODO unwind this
@@ -64,7 +65,7 @@
 
 .ResetBallServe
     ; Reset the serve
-    LD A, 0x00
+    LD A, 0xFF
     LD (.BallYDirection), A
 
     RET
@@ -106,7 +107,6 @@
     JP EQ, .PaddleBWins
 
     RET
-
 
 .UpdateUserExitFlag
     PUSH A

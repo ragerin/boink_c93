@@ -19,11 +19,7 @@
     CALL .ResetScore
     CALL .ResetBallServe
     
-.StartNewGame                       ; Called between rounds to reset only some variables
-    ; Check scores to see if we have a winner
-    CALL .CheckForWinners
-    CALL .SetDefaultPaddlePositions
-    CALL .InitializeBall
+    CALL .PrepareNewGame
 
 ; Primary Game loop screen
 .MainGameScreen 
@@ -40,4 +36,13 @@
     JP .MainGameScreen
 
 .ExitProgram
+    RET
+
+
+.PrepareNewGame                       ; Called between rounds to reset only some variables
+    ; Check scores to see if we have a winner
+    CALL .CheckForWinners
+    CALL .SetDefaultPaddlePositions
+    CALL .InitializeBall
+
     RET
