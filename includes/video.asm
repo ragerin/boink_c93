@@ -72,8 +72,8 @@
 .DrawBall
     LD A, 0x06                      ; DrawFilledRectangle
     LD B, 1                         ; Video page
-    LD CD, (.BallX)                 ; X position top left
-    LD EF, (.BallY)                 ; Y position top left
+    LD CD, (.BallXPosition)                 ; X position top left
+    LD EF, (.BallYPosition)                 ; Y position top left
     LD GH, (.BallSize)              ; Width
     LD IJ, (.BallSize)              ; Height
     LD K, 100                       ; Color

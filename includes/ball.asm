@@ -1,18 +1,29 @@
+.UpdateBallY2
+    ; Base ball movement
+    LD BC, (.BallYPosition)             ; Load the Y position
+    LD DE, (.BallYSpeed)                ; Load the Y delta
+    LD F, (.BallYDirection)             ; Load the Y sign (going up or down)
+
+    RET
+
+
+
+
 .UpdateBallY
     ; Base ball movement
-    LD BC, (.BallY)                 ; Load the Y position
-    LD DE, (.BallDY)                ; Load the Y delta
-    LD F, (.BallDYS)                ; Load the Y sign (going up or down)
+    LD BC, (.BallYPosition)                 ; Load the Y position
+    LD DE, (.BallYSpeed)                ; Load the Y delta
+    LD F, (.BallYDirection)                ; Load the Y sign (going up or down)
     CP F, 0x00                      ; Check if the ball is moving up or down, 0 is down
     CALL EQ, .UpdateBallY_down      ; Move the ball either up or down
     CALL NE, .UpdateBallY_up
 
     ; Handle Out Of Bounds
-    LD DE, (.OOBTop)                ; Load the top margin for Out-of-bounds
+    LD DE, (.TopMargin)             ; Load the top margin for Out-of-bounds
     CP BC, DE
     JR LTE, .UpdateBallY_oob_top    ; If the ball's top is touching the OOB
 
-    LD FG, (.OOBBottom)
+    LD FG, (.BottomMargin)
     SUB16 FG, (.BallSize)           ; Subtract the ball size, to check from its bottom
     CP BC, FG
     JR GTE, .UpdateBallY_oob_bottom ; If the ball's bottom is touching the OOB
@@ -30,7 +41,7 @@
     CALL GTE, .UpdateBallY_paddleBhit
 
     ; Else, we just keep moving the ball
-    LD (.BallY), BC                 ; Write the new Y position
+    LD (.BallYPosition), BC                 ; Write the new Y position
     RET
 .UpdateBallY_down
     ADD BC, DE
@@ -51,8 +62,8 @@
 
 .UpdateBallY_paddleAhit
     PUSH BC                         ; Store the Y value
-    LD BC, (.BallX)                 ; Ball left edge
-    LD DE, (.BallX)                 ; Ball right edge
+    LD BC, (.BallXPosition)                 ; Ball left edge
+    LD DE, (.BallXPosition)                 ; Ball right edge
     ADD16 DE, (.BallSize)
     LD FG, (.PaddleAX)              ; Paddle left edge
     LD HI, (.PaddleAX)              ; Paddle right edge
@@ -64,8 +75,8 @@
     RET
 .UpdateBallY_paddleBhit
     PUSH BC                         ; Store the Y value
-    LD BC, (.BallX)                 ; Ball left edge
-    LD DE, (.BallX)                 ; Ball right edge
+    LD BC, (.BallXPosition)                 ; Ball left edge
+    LD DE, (.BallXPosition)                 ; Ball right edge
     ADD16 DE, (.BallSize)
     LD FG, (.PaddleBX)              ; Paddle left edge
     LD HI, (.PaddleBX)              ; Paddle right edge
@@ -96,24 +107,24 @@
     INC Z
     RET
 .UpdateBallY_bounce
-    LD A, (.BallDYS)                ; Loads the ball delta Y sign
+    LD A, (.BallYDirection)                ; Loads the ball delta Y sign
     XOR A, 1                        ; Invert the bit
-    LD (.BallDYS), A                ; Store the inverted sign
+    LD (.BallYDirection), A                ; Store the inverted sign
 .UpdateBallY_ret
     RET
 
 
 .UpdateBallX
-    LD BC, (.BallX)                 ; Load the ball X position
-    LD DE, (.BallDX)                ; Load the ball X delta
+    LD BC, (.BallXPosition)                 ; Load the ball X position
+    LD DE, (.BallXSpeed)                ; Load the ball X delta
     LD F, (.BallXDirection)         ; Load the ball X direction
     
     SMUL DE, F                      ; Multiply speed with direction
     ADD BC, DE                      ; Add effective direction*speed to current X
 
     ; Handle wall collisions
-    LD DE, (.WallLeft)              ; Load the left limit
-    LD FG, (.WallRight)             ; Load the right limit
+    LD DE, (.LeftMargin)              ; Load the left limit
+    LD FG, (.RightMargin)             ; Load the right limit
 
     CP BC, DE
     LDF D, 0b01000000               ; Get the GT flag
@@ -121,9 +132,9 @@
     LDF E, 0b10000000               ; Get the LT flag
     OR D, E                         ; Mix the flags
     INV D                           ; Invert so we get the LTE and GTE flags instead of GT and LT
-    SR D, 6                         ; shift the flags so we can only get 10 or 01 (1 or 2)
+    SR D, 6                         ; shift the flags so we can only get 10, 01 or 00 if no direction change
     CP D, 0
-    JR Z, .NoDirectionChange
+    JR Z, .noDirectionChange
 
     INV D                           ; Invert bits, so 00000010 becomes 11111101 and 00000001 becomes 11111110
     ADD D, 3                        ; Add 3 so 11111101 becomes 0 and 11111110 becomes 1
@@ -132,6 +143,18 @@
 
     LD (.BallXDirection), D
 
-.NoDirectionChange
-    LD (.BallX), BC                 ; Store the new X position in memory
+.noDirectionChange
+    LD (.BallXPosition), BC                 ; Store the new X position in memory
+    RET
+
+; Evaluate ball direction given X or Y margins
+; A - previous direction (-1 or 1)
+; B - speed for given coordinate
+; CD - (-1) screen limit
+; EF - (1) screen limit
+.SetUpdatedDirection
+    PUSH A, Z
+
+
+    POP A, Z
     RET

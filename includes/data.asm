@@ -23,26 +23,26 @@
 
 .BallSize
     #DB 005
-.BallX
+.BallXPosition
     #DB 00237
-.BallDX
+.BallXSpeed
     #DB 001
 .BallXDirection
     #DB 0xFF            ; 0xFF: -1, 0x01: 1
-.BallY
+.BallYPosition
     #DB 0030
-.BallDY
-    #DB 002
-.BallDYS
+.BallYSpeed
+    #DB 002         
+.BallYDirection
     #DB 0x00                        ; sign: 0x00 positive, 0x01 negative
 
-.WallLeft
+.LeftMargin
     #DB 0010
-.WallRight
+.RightMargin
     #DB 00470
-.OOBTop
+.TopMargin
     #DB 005                         ; 5 from the top of the screen
-.OOBBottom
+.BottomMargin
     #DB 00265                       ; 5 from the bottom of the screen
 
 .ScoreA
