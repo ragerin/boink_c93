@@ -115,46 +115,43 @@
 
 
 .UpdateBallX
-    LD BC, (.BallXPosition)                 ; Load the ball X position
-    LD DE, (.BallXSpeed)                ; Load the ball X delta
-    LD F, (.BallXDirection)         ; Load the ball X direction
-    
-    SMUL DE, F                      ; Multiply speed with direction
-    ADD BC, DE                      ; Add effective direction*speed to current X
-
-    ; Handle wall collisions
+    LD BC, (.BallXSpeed)                ; Load the ball X delta
     LD DE, (.LeftMargin)              ; Load the left limit
     LD FG, (.RightMargin)             ; Load the right limit
+    LD HIJ, .BallXPosition          ; Address to the X position
+    LD KLM, .BallXDirection         ; Address to the X direction
+    
+    ; Handle left-right wall collisions
+    CALL .SetUpdatedDirection
+
+    RET
+
+; Evaluate ball direction on X or Y
+; BC - speed for given axis
+; DE - (-1) screen limit
+; FG - (1) screen limit
+; HIJ - axis coordinate address reference
+; KLM - axis direction address reference
+.SetUpdatedDirection
+    PUSH A, M
+    LD A, (KLM)                     ; Load the ball X or Y direction
+
+    SMUL BC, A                      ; Multiply speed with direction
+    ADD16 (HIJ), BC                 ; Add effective direction*speed to current X position
+    LD BC, (HIJ)                    ; Get X coordinate
 
     CP BC, DE
     LDF D, 0b01000000               ; Get the GT flag
     CP BC, FG
     LDF E, 0b10000000               ; Get the LT flag
     OR D, E                         ; Mix the flags
-    INV D                           ; Invert so we get the LTE and GTE flags instead of GT and LT
-    SR D, 6                         ; shift the flags so we can only get 10, 01 or 00 if no direction change
-    CP D, 0
-    JR Z, .noDirectionChange
+    CP D, 0b11000000                ; Check the GT (min), LT (max) flags. If both set, it means...
+    JR Z, .noDirectionChange        ; ... the direction is unchanged
 
-    INV D                           ; Invert bits, so 00000010 becomes 11111101 and 00000001 becomes 11111110
-    ADD D, 3                        ; Add 3 so 11111101 becomes 0 and 11111110 becomes 1
-    MUL D, 2                        ; transform that to 0 and 2
-    DEC D                           ; and again it can get to -1 and 1
-
-    LD (.BallXDirection), D
+    DEC A                           ; Turns FF (-1) into 1...
+    INV A                           ; ... or 1 into -1 (FF)
+    LD (KLM), A                     ; Update the new direction
 
 .noDirectionChange
-    LD (.BallXPosition), BC                 ; Store the new X position in memory
-    RET
-
-; Evaluate ball direction given X or Y margins
-; A - previous direction (-1 or 1)
-; B - speed for given coordinate
-; CD - (-1) screen limit
-; EF - (1) screen limit
-.SetUpdatedDirection
-    PUSH A, Z
-
-
-    POP A, Z
+    POP A, M
     RET
