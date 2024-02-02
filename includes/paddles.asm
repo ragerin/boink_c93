@@ -4,11 +4,11 @@
     CP A, 2
     JP LTE, .UpdateCompPaddle_ret
 
-    LD BC, (.BallX)                 ; Load the ball x
+    LD BC, (.BallXPosition)                 ; Load the ball x
     LD DE, (.PaddleAX)              ; Load the paddle left edge
     ADD DE, 5                       ; Shrink it a bit
     LD FG, (.PaddleAX)              ; Load the paddle right edge
-    ADD16 FG, (.PaddleASize)
+    ADD16 FG, (.PaddleAWidth)
     ADD FG, 5                       ; Shrink it a bit
 
     CP BC, DE
@@ -54,7 +54,7 @@
     LD HIJ, .PaddleAX
     LD BC, (HIJ)              ; Load the paddle X
     LD DE, (.PaddleASpeed)          ; Load the speed
-    LD FG, (.PaddleASize)
+    LD FG, (.PaddleAWidth)
     CALL .MovePaddle
     RET
 
@@ -62,7 +62,7 @@
     LD HIJ, .PaddleBX
     LD BC, (HIJ)              ; Load the paddle X
     LD DE, (.PaddleBSpeed)          ; Load the speed
-    LD FG, (.PaddleBSize)
+    LD FG, (.PaddleBWidth)
     CALL .MovePaddle
     RET
 
@@ -71,13 +71,13 @@
     ADD BC, DE              
 
     ; Check right wall collision
-    LD DE, (.WallRight)
+    LD DE, (.RightMargin)
     SUB DE, FG
     CP BC, DE
     JR GT, .movePaddle_exit
 
     ; Check left wall collision
-    LD DE, (.WallLeft)
+    LD DE, (.LeftMargin)
     CP BC, DE
     JR LT, .movePaddle_exit
 

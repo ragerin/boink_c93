@@ -59,12 +59,12 @@
     ; A
     LD CD, (.PaddleAX)              ; X position top left
     LD EF, (.PaddleAY)              ; Y position top left
-    LD GH, (.PaddleASize)           ; Width
+    LD GH, (.PaddleAWidth)           ; Width
     INT 0x01, A                     ; Video interrupt
     ; B
     LD CD, (.PaddleBX)              ; X position top left
     LD EF, (.PaddleBY)              ; Y position top left
-    LD GH, (.PaddleBSize)           ; Width
+    LD GH, (.PaddleBWidth)           ; Width
     INT 0x01, A                     ; Video interrupt
 
     RET
@@ -72,8 +72,8 @@
 .DrawBall
     LD A, 0x06                      ; DrawFilledRectangle
     LD B, 1                         ; Video page
-    LD CD, (.BallX)                 ; X position top left
-    LD EF, (.BallY)                 ; Y position top left
+    LD CD, (.BallXPosition)                 ; X position top left
+    LD EF, (.BallYPosition)                 ; Y position top left
     LD GH, (.BallSize)              ; Width
     LD IJ, (.BallSize)              ; Height
     LD K, 100                       ; Color

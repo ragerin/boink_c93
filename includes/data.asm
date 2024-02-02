@@ -14,36 +14,36 @@
     #DB 004
 .PaddleBSpeed
     #DB 004
-.PaddleASize
-    #DB 0068
-.PaddleBSize
-    #DB 0068
+.PaddleAWidth
+    #DB 0048
+.PaddleBWidth
+    #DB 0048
 .PaddleHeight
     #DB 0010
 
 .BallSize
     #DB 005
-.BallX
+.BallXPosition
     #DB 00237
-.BallDX
+.BallXSpeed
     #DB 001
 .BallXDirection
-    #DB 0xFF            ; 0xFF: -1, 0x01: 1
-.BallY
+    #DB 0xFF                        ; 0xFF: -1 (left), 0x01: 1 (right)
+.BallYPosition
     #DB 0030
-.BallDY
-    #DB 002
-.BallDYS
-    #DB 0x00                        ; sign: 0x00 positive, 0x01 negative
+.BallYSpeed
+    #DB 002         
+.BallYDirection
+    #DB 0xFF                        ; 0xFF: -1 (up), 0x01: 1 (down)
 
-.WallLeft
+.LeftMargin
     #DB 0010
-.WallRight
+.RightMargin
     #DB 00470
-.OOBTop
-    #DB 005                         ; 5 from the top of the screen
-.OOBBottom
-    #DB 00265                       ; 5 from the bottom of the screen
+.TopMargin
+    #DB 0010                         ; 5 from the top of the screen
+.BottomMargin
+    #DB 00260                       ; 5 from the bottom of the screen
 
 .ScoreA
     #DB 48, 0                       ; Using 48 as 0 to easily display as text

@@ -17,10 +17,11 @@
     CALL .InputKeyPressed
     CALL Z, .MovePaddleBRight
 
+    CALL .CheckPaddleCollision
     ; Update the ball position
     CALL .UpdateBallX
     CALL .UpdateBallY
-
+    
     RET
 
 ; TODO unwind this
@@ -64,8 +65,8 @@
 
 .ResetBallServe
     ; Reset the serve
-    LD A, 0x00
-    LD (.BallDYS), A
+    LD A, 0xFF
+    LD (.BallYDirection), A
 
     RET
 
@@ -78,9 +79,9 @@
 
 .InitializeBall
     LD AB, 237
-    LD (.BallX), AB
+    LD (.BallXPosition), AB
     ; Check who has the serve by looking at the Y sign
-    LD A, (.BallDYS)
+    LD A, (.BallYDirection)
     CP A, 0
     JP EQ, .ResetGame_a_serve       ; 0 is moving down, so A serves
     LD AB, 240                      ; Or we set the ball up for B
@@ -88,7 +89,7 @@
 .ResetGame_a_serve
     LD AB, 25                       ; Set the ball up for A
 .ResetGame_end
-    LD (.BallY), AB
+    LD (.BallYPosition), AB
     
     RAND A, 2                       ; Randomize X direction
     MUL A, 2
@@ -106,7 +107,6 @@
     JP EQ, .PaddleBWins
 
     RET
-
 
 .UpdateUserExitFlag
     PUSH A

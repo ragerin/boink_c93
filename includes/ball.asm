@@ -1,137 +1,144 @@
-.UpdateBallY
-    ; Base ball movement
-    LD BC, (.BallY)                 ; Load the Y position
-    LD DE, (.BallDY)                ; Load the Y delta
-    LD F, (.BallDYS)                ; Load the Y sign (going up or down)
-    CP F, 0x00                      ; Check if the ball is moving up or down, 0 is down
-    CALL EQ, .UpdateBallY_down      ; Move the ball either up or down
-    CALL NE, .UpdateBallY_up
-
-    ; Handle Out Of Bounds
-    LD DE, (.OOBTop)                ; Load the top margin for Out-of-bounds
-    CP BC, DE
-    JR LTE, .UpdateBallY_oob_top    ; If the ball's top is touching the OOB
-
-    LD FG, (.OOBBottom)
-    SUB16 FG, (.BallSize)           ; Subtract the ball size, to check from its bottom
-    CP BC, FG
-    JR GTE, .UpdateBallY_oob_bottom ; If the ball's bottom is touching the OOB
-
-    ; Handle paddle collision
-    ; A
-    LD DE, (.PaddleAY)
-    ADD16 DE, (.PaddleHeight)
-    CP BC, DE
-    CALL LTE, .UpdateBallY_paddleAhit
-    ; B
-    LD DE, (.PaddleBY)
-    SUB16 DE, (.BallSize)
-    CP BC, DE
-    CALL GTE, .UpdateBallY_paddleBhit
-
-    ; Else, we just keep moving the ball
-    LD (.BallY), BC                 ; Write the new Y position
-    RET
-.UpdateBallY_down
-    ADD BC, DE
-    RET
-.UpdateBallY_up
-    SUB BC, DE
-    RET
-.UpdateBallY_oob_top
-    LD AB, (.ScoreB)
-    INC A
-    LD (.ScoreB), AB
-    JP .StartNewGame
-.UpdateBallY_oob_bottom
-    LD AB, (.ScoreA)
-    INC A
-    LD (.ScoreA), AB
-    JP .StartNewGame
-
-.UpdateBallY_paddleAhit
-    PUSH BC                         ; Store the Y value
-    LD BC, (.BallX)                 ; Ball left edge
-    LD DE, (.BallX)                 ; Ball right edge
-    ADD16 DE, (.BallSize)
-    LD FG, (.PaddleAX)              ; Paddle left edge
-    LD HI, (.PaddleAX)              ; Paddle right edge
-    ADD16 HI, (.PaddleASize)
-    ; ADD16 HI, (.BallSize)           ; Increase PRE to allow right edge hits
-    SUB HI, 1
-    CALL .UpdateBallY_paddle_collision
-    POP BC
-    RET
-.UpdateBallY_paddleBhit
-    PUSH BC                         ; Store the Y value
-    LD BC, (.BallX)                 ; Ball left edge
-    LD DE, (.BallX)                 ; Ball right edge
-    ADD16 DE, (.BallSize)
-    LD FG, (.PaddleBX)              ; Paddle left edge
-    LD HI, (.PaddleBX)              ; Paddle right edge
-    ADD16 HI, (.PaddleBSize)
-    ADD16 HI, (.BallSize)           ; Increase PRE to allow right edge hits
-    SUB HI, 1
-    CALL .UpdateBallY_paddle_collision
-    POP BC
-    RET
-.UpdateBallY_paddle_collision
-    LD Z, 0                         ; Set up flag counter for AND-ing the left-right checks
-
-    ; Check ball's left edge is within paddle right edge
-    LD LM, HI                       ; Copy PRE for math
-    SUB LM, BC                      ; PRE - BLE
-    CALL SP, .UpdateBallY_flag_inc  ; Increase the flag if positive
-
-    ; Check ball's right edge is within paddle left edge
-    LD JK, DE                       ; Copy BRE for math
-    SUB JK, FG                      ; BRE - PLE
-    CALL SP, .UpdateBallY_flag_inc  ; Increase the flag if positive
+; Checks whether any paddles get in contact
+; with the ball and inverts the direction if so
+.CheckPaddleCollision
+    ; Check for player A
+    LD AB, (.PaddleAX)
+    LD EF, (.PaddleAWidth)
     
-    CP Z, 2                         ; Compare the flag counter
-    JP GTE, .UpdateBallY_bounce
+    CALL .CheckPaddleXCollision
+    JR NZ, .noPaddleACollision
 
-    JP .UpdateBallY_ret
-.UpdateBallY_flag_inc
-    INC Z
-    RET
-.UpdateBallY_bounce
-    LD A, (.BallDYS)                ; Loads the ball delta Y sign
-    XOR A, 1                        ; Invert the bit
-    LD (.BallDYS), A                ; Store the inverted sign
-.UpdateBallY_ret
+    LD CD, (.PaddleAY)
+    ADD16 CD, (.PaddleHeight)
+    INC CD
+    CALL .CheckPaddleYCollision
+
+    JR GTE, .noPaddleACollision
+
+    CALL .InvertBallDirection
+
+.noPaddleACollision
+    ; Check for player B
+    LD AB, (.PaddleBX)
+    LD EF, (.PaddleBWidth)
+
+    CALL .CheckPaddleXCollision
+    JR NZ, .noPaddleBCollision
+
+    LD CD, (.PaddleBY)
+    SUB16 CD, (.BallSize)
+    CALL .CheckPaddleYCollision
+
+    JR LTE, .noPaddleBCollision
+
+    CALL .InvertBallDirection
+.noPaddleBCollision
     RET
 
+.InvertBallDirection
+    LD A, (.BallYDirection)                     ; Update the new direction
+    DEC A                           ; Turns FF (-1) into 1...
+    INV A                           ; ... or 1 into -1 (FF)
+    LD (.BallYDirection), A                     ; Update the new direction
+
+    RET
+
+; Z set if X between paddle x limits
+.CheckPaddleXCollision
+    ADD EF, AB
+    INC EF                  ; Calculated maximum X
+
+    SUB16 AB, (.BallSize)
+    INC AB                  ; Calculated minimum X
+    
+    LD GH, (.BallXPosition)
+
+    CP GH, AB
+    LDF K, 0b01000000               ; Get the GT flag
+    CP GH, EF
+    LDF L, 0b10000000               ; Get the LT flag
+    OR K, L
+    SR K, 6
+    CP K, 3
+
+    RET
+
+.CheckPaddleYCollision
+    LD IJ, (.BallYPosition)                   ; Calculated minimum Y
+    CP IJ, CD
+
+    RET
+
+.UpdateBallY
+    LD BC, (.BallYSpeed)            ; Load the ball Y delta
+    LD DE, (.TopMargin)             ; Load the top limit
+    LD FG, (.BottomMargin)          ; Load the bottom limit
+    LD HIJ, .BallYPosition          ; Address to the Y position
+    LD KLM, .BallYDirection         ; Address to the Y direction
+    
+    LD N, (KLM)                     ; Previous direction
+    ; Handle top-bottom
+    CALL .SetUpdatedDirection
+    CP A, N
+    JR Z, .updateYExit
+    CALL Z, .PlayerAWins
+    CALL NZ, .PlayerBWins
+.updateYExit
+
+    RET
 
 .UpdateBallX
-    LD BC, (.BallX)                 ; Load the ball X position
-    LD DE, (.BallDX)                ; Load the ball X delta
-    LD F, (.BallXDirection)         ; Load the ball X direction
+    LD BC, (.BallXSpeed)            ; Load the ball X delta
+    LD DE, (.LeftMargin)            ; Load the left limit
+    LD FG, (.RightMargin)           ; Load the right limit
+    LD HIJ, .BallXPosition          ; Address to the X position
+    LD KLM, .BallXDirection         ; Address to the X direction
     
-    SMUL DE, F                      ; Multiply speed with direction
-    ADD BC, DE                      ; Add effective direction*speed to current X
+    ; Handle left-right wall collisions
+    CALL .SetUpdatedDirection
 
-    ; Handle wall collisions
-    LD DE, (.WallLeft)              ; Load the left limit
-    LD FG, (.WallRight)             ; Load the right limit
+    RET
+
+; Evaluate ball direction on X or Y
+; BC - speed for given axis
+; DE - (-1) screen limit
+; FG - (1) screen limit
+; HIJ - axis coordinate address reference
+; KLM - axis direction address reference
+.SetUpdatedDirection
+    LD A, (KLM)                     ; Load the ball X or Y direction
+
+    SMUL BC, A                      ; Multiply speed with direction
+    ADD16 (HIJ), BC                 ; Add effective direction*speed to current X position
+    LD BC, (HIJ)                    ; Get X coordinate
 
     CP BC, DE
     LDF D, 0b01000000               ; Get the GT flag
     CP BC, FG
     LDF E, 0b10000000               ; Get the LT flag
     OR D, E                         ; Mix the flags
-    INV D                           ; Invert so we get the LTE and GTE flags instead of GT and LT
-    SR D, 6                         ; shift the flags so we can only get 10 or 01 (1 or 2)
-    CP D, 0
-    JR Z, .NoDirectionChange
+    CP D, 0b11000000                ; Check the GT (min), LT (max) flags. If both set, it means...
+    JR Z, .noDirectionChange        ; ... the direction is unchanged
 
-    INV D                           ; Invert bits, so 00000010 becomes 11111101 and 00000001 becomes 11111110
-    ADD D, 3                        ; Add 3 so 11111101 becomes 0 and 11111110 becomes 1
-    MUL D, 2                        ; transform that to 0 and 2
-    DEC D                           ; and again it can get to -1 and 1
+    DEC A                           ; Turns FF (-1) into 1...
+    INV A                           ; ... or 1 into -1 (FF)
+    LD (KLM), A                     ; Update the new direction
 
-    LD (.BallXDirection), D
+.noDirectionChange
+    RET
 
-.NoDirectionChange
-    LD (.BallX), BC                 ; Store the new X position in memory
+
+.PlayerBWins
+    LD AB, (.ScoreB)
+    INC A
+    LD (.ScoreB), AB
+    CALL .InvertBallDirection
+    CALL .PrepareNewGame
+    RET
+
+.PlayerAWins
+    LD AB, (.ScoreA)
+    INC A
+    LD (.ScoreA), AB
+    CALL .PrepareNewGame
     RET
