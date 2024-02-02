@@ -4,7 +4,7 @@
     CP A, 2
     JP LTE, .UpdateCompPaddle_ret
 
-    LD BC, (.BallXPosition)                 ; Load the ball x
+    LD BC, (.BallXPosition)         ; Load the ball x
     LD DE, (.PaddleAX)              ; Load the paddle left edge
     ADD DE, 5                       ; Shrink it a bit
     LD FG, (.PaddleAX)              ; Load the paddle right edge

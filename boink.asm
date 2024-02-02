@@ -25,7 +25,7 @@
 .MainGameScreen 
     ; Update clock routine for frame delta time
     CALL .HasUpdateTimePassed       ; Updates the clock and also returns whether it passed the target frame time
-    JR NZ, .MainGameScreen        ; We loop back until the allowed timeframe is reached
+    JR NZ, .MainGameScreen          ; We loop back until the allowed timeframe is reached
 
     CALL .Update                    ; Figure out the state
     CALL .Draw                      ; Render objects from state
