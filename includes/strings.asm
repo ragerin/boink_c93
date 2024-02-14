@@ -19,6 +19,7 @@
     LD JK, 1                        ; Y coordinate
     LD L, (.StringColor)            ; Color
     CALL .DrawString
+
     RET
 
 .DrawScores
@@ -33,9 +34,14 @@
     LD JK, 255
     LD L, (.StringColor)
     CALL .DrawString
+    
     RET
 
 .DrawGameOverString
+    LD A, (.GameOver)
+    CP A, 0
+    RETIF EQ
+    
     LD EFG, (.StringWinPointer)     ; Loads the 3 byte address stored in memory
     LD HI, 200
     LD JK, 50
@@ -51,6 +57,7 @@
     LD JK, 80
     LD L, (.StringColor)
     CALL .DrawString
+
     RET
 
 ; Routine to draw text
@@ -62,4 +69,5 @@
     LD BCD, .FontData               ; The address of the font to use
     LD M, 2                         ; Video page
     INT 0x01, A                     ; Video interrupt
+
     RET

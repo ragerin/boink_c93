@@ -35,13 +35,6 @@
 .noPaddleBCollision
     RET
 
-.InvertBallDirection
-    LD A, (.BallYDirection)                     ; Update the new direction
-    DEC A                           ; Turns FF (-1) into 1...
-    INV A                           ; ... or 1 into -1 (FF)
-    LD (.BallYDirection), A                     ; Update the new direction
-
-    RET
 
 ; Z set if X between paddle x limits
 .CheckPaddleXCollision
@@ -63,11 +56,13 @@
 
     RET
 
+
 .CheckPaddleYCollision
     LD IJ, (.BallYPosition)                   ; Calculated minimum Y
     CP IJ, CD
 
     RET
+
 
 .UpdateBallY
     LD BC, (.BallYSpeed)            ; Load the ball Y delta
@@ -87,6 +82,7 @@
 
     RET
 
+
 .UpdateBallX
     LD BC, (.BallXSpeed)            ; Load the ball X delta
     LD DE, (.LeftMargin)            ; Load the left limit
@@ -98,6 +94,7 @@
     CALL .SetUpdatedDirection
 
     RET
+
 
 ; Evaluate ball direction on X or Y
 ; BC - speed for given axis
@@ -129,16 +126,21 @@
 
 
 .PlayerBWins
-    LD AB, (.ScoreB)
-    INC A
-    LD (.ScoreB), AB
+    INC (.ScoreB)
     CALL .InvertBallDirection
     CALL .PrepareNewGame
     RET
 
 .PlayerAWins
-    LD AB, (.ScoreA)
-    INC A
-    LD (.ScoreA), AB
+    INC (.ScoreA)
     CALL .PrepareNewGame
+    RET
+
+
+.InvertBallDirection
+    LD A, (.BallYDirection)         ; Update the new direction
+    DEC A                           ; Turns FF (-1) into 1...
+    INV A                           ; ... or 1 into -1 (FF)
+    LD (.BallYDirection), A         ; Update the new direction
+
     RET

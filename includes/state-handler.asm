@@ -2,11 +2,15 @@
     ; This is the fixed cycle update routine, which is called as uniformly as possible
     ; to maintain a near-fixed update rate
     
-    ; Paddle A movement (computer)
-    CALL .UpdateCompPaddle
-
     ; Update keyboard input
     CALL .InputUpdate
+
+    LD A, (.GameOver)
+    CP A, 1
+    JR Z, .GameOverUpdate
+
+    ; Paddle A movement (computer)
+    CALL .UpdateCompPaddle
     CALL .UpdateUserExitFlag
 
     ; Paddle B movement
@@ -24,35 +28,30 @@
     
     RET
 
-; TODO unwind this
-; Game over screen
-.PaddleAWins
-    LD PQR, .StringAWin             ; Load the string address
-    LD (.StringWinPointer), PQR     ; Store the value in the pointer value
-    JP .PaddleWinScreen
-.PaddleBWins
-    LD PQR, .StringBWin             ; Load the string address
-    LD (.StringWinPointer), PQR     ; Store the value in the pointer value
-    JP .PaddleWinScreen
-.PaddleWinScreen
-
-    ; Keyboard input
-    CALL .InputUpdate
-    CALL .UpdateUserExitFlag        ; Esc to escape
+.GameOverUpdate
 
     LD A, 27                        ; Escape key
     CALL .InputKeyPressed
-    JP Z, .ResetGame
+    CALL Z, .ResetGame
 
     LD A, 89                        ; Y for restarting the game
     CALL .InputKeyPressed
-    JP Z, .ResetGame
+    CALL Z, .ResetGame
 
-    CALL .DrawGameOverString        ; Draw the game over strings
-    
-    VDL 0b00000111                  ; Manually draw the video frames to the render buffer
+    RET
 
-    JP .PaddleWinScreen
+
+.PaddleAWins
+    LD PQR, .StringAWin             ; Load the string address
+    LD (.StringWinPointer), PQR     ; Store the value in the pointer value
+    LD (.GameOver), 0x01
+    RET
+
+.PaddleBWins
+    LD PQR, .StringBWin             ; Load the string address
+    LD (.StringWinPointer), PQR     ; Store the value in the pointer value
+    LD (.GameOver), 0x01
+    RET
 
 
 .ResetScore
@@ -80,6 +79,7 @@
 .InitializeBall
     LD AB, 237
     LD (.BallXPosition), AB
+
     ; Check who has the serve by looking at the Y sign
     LD A, (.BallYDirection)
     CP A, 0
@@ -100,10 +100,10 @@
 
 .CheckForWinners
     LD AB, (.ScoreA)
-    CP A, 50                        ; Reached 2 points
+    CP A, 58                        ; Reached 10 points
     JP EQ, .PaddleAWins
     LD AB, (.ScoreB)
-    CP A, 50                        ; Reached 2 points
+    CP A, 58                        ; Reached 10 points
     JP EQ, .PaddleBWins
 
     RET
@@ -125,3 +125,4 @@
     CP A, 1
     POP A
     RET
+	

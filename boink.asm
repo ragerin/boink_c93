@@ -1,3 +1,6 @@
+; Boink V1.0 - Created by Ragerin
+; Compatible with Continuum Emulator V 0.7.114 and above
+
 #include includes\keyboard.asm
 #include includes\video.asm
 #include includes\clock.asm
@@ -7,25 +10,19 @@
 #include includes\state-handler.asm
 #include includes\data.asm
 
-
     #ORG 0x080000
     
     CALL .InitializeVideo           ; Initialize the video
     CALL .InitializeClock           ; Initialize the clock time
     CALL .InitializeFonts           ; Font and static strings setup
     
-; Setup game variables
-.ResetGame                          ; Called when we want to fully reset
-    CALL .ResetScore
-    CALL .ResetBallServe
-    
-    CALL .PrepareNewGame
+    CALL .ResetGame
 
 ; Primary Game loop screen
 .MainGameScreen 
     ; Update clock routine for frame delta time
     CALL .HasUpdateTimePassed       ; Updates the clock and also returns whether it passed the target frame time
-    JR NZ, .MainGameScreen        ; We loop back until the allowed timeframe is reached
+    JR NZ, .MainGameScreen          ; We loop back until the allowed timeframe is reached
 
     CALL .Update                    ; Figure out the state
     CALL .Draw                      ; Render objects from state
@@ -39,6 +36,14 @@
     RET
 
 
+; Setup game variables
+.ResetGame                          ; Called when we want to fully reset
+    CALL .ResetScore
+    CALL .ResetBallServe
+    LD (.GameOver), 0
+    CALL .PrepareNewGame
+    RET
+
 .PrepareNewGame                       ; Called between rounds to reset only some variables
     ; Check scores to see if we have a winner
     CALL .CheckForWinners
@@ -46,3 +51,4 @@
     CALL .InitializeBall
 
     RET
+

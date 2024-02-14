@@ -18,6 +18,7 @@
 
     RET
 
+
 .ClearBG
     LD B, 0                         ; Page 0
     LD C, (.BGColor)                ; Color
@@ -43,12 +44,15 @@
 
     CALL .DrawPaddles
     CALL .DrawBall
+
     ; Draw the UI
     CALL .DrawStaticStrings
     CALL .DrawScores
+    CALL .DrawGameOverString
 
     VDL 0b00000111                  ; Manually draw the video frames to the render buffer
     RET
+
 
 .DrawPaddles
     ; Shared
