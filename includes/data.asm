@@ -1,6 +1,3 @@
-
-
-
 ; Game memory
 .PaddleAX
     #DB 0x0000
@@ -49,6 +46,9 @@
     #DB 48, 0                       ; Using 48 as 0 to easily display as text
 .ScoreB
     #DB 48, 0
+
+.GameOver                           ; 0 is false, 1 is true
+    #DB 0
 
 
 ; Fonts and strings

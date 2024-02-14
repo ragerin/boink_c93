@@ -126,17 +126,13 @@
 
 
 .PlayerBWins
-    LD AB, (.ScoreB)
-    INC A
-    LD (.ScoreB), AB
+    INC (.ScoreB)
     CALL .InvertBallDirection
     CALL .PrepareNewGame
     RET
 
 .PlayerAWins
-    LD AB, (.ScoreA)
-    INC A
-    LD (.ScoreA), AB
+    INC (.ScoreA)
     CALL .PrepareNewGame
     RET
 
